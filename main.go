@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
-func repeat(words ...string) {
-	fmt.Println(words)
+func lenAndUPPER(word string) (length int, UPPERCASE string) {
+	length = len(word)
+	UPPERCASE = strings.ToUpper(word)
+	return length, UPPERCASE
 }
 func main() {
-	repeat("y", "e", "e")
+	fmt.Println(lenAndUPPER("yee"))
 }
