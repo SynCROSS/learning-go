@@ -6,7 +6,8 @@ import (
 )
 
 func lenAndUPPER(word string) (length int, UPPERCASE string) {
-  	defer fmt.Println("I'm done. :)")
+	defer fmt.Println("I'm done. :)")
+	fmt.Println("I'm started!")
 	length = len(word)
 	UPPERCASE = strings.ToUpper(word)
 	return length, UPPERCASE
