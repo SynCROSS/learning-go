@@ -13,8 +13,11 @@ func fibonacci(number int) {
     preTmp=tmp
     tmp=total
 
-    if total>number{
+    switch {
+    case total>number:
       break
+    default:
+      continue
     }
   }
 }
