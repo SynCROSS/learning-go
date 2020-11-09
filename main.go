@@ -4,14 +4,21 @@ import (
 	"fmt"
 )
 
-func addSomething(numbers ...int) int {
-  total:=0
-  for _, number:=range numbers{
-    total+=number
+func fibonacci(number int) {
+	var total, tmp, preTmp int=0,1,1
+
+  for {
+    total=preTmp+tmp
+    fmt.Println(total)
+    preTmp=tmp
+    tmp=total
+
+    if total>number{
+      break
+    }
   }
-  return total
 }
 
 func main() {
-	fmt.Println(addSomething(1,2,3,4,5,6,7,8,9,10))
+	fibonacci(18)
 }
