@@ -4,24 +4,21 @@ import (
 	"fmt"
 )
 
-func fibonacci(number int) {
-	var total, tmp, preTmp int=0,1,1
-
-  for {
-    total=preTmp+tmp
-    fmt.Println(total)
-    preTmp=tmp
-    tmp=total
-
-    switch {
-    case total>number:
-      break
-    default:
-      continue
-    }
-  }
+func seasonGenerator(month int) string {
+	switch month {
+	case 3, 4, 5:
+		return "Spring"
+	case 6, 7, 8:
+		return "Summer"
+	case 9, 10, 11:
+		return "Fall"
+	case 12, 1, 2:
+		return "Winter"
+	default:
+	}
+	return "none"
 }
 
 func main() {
-	fibonacci(18)
+	fmt.Println(seasonGenerator(10))
 }
