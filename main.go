@@ -5,10 +5,8 @@ import (
 )
 
 func main() {
-	array := [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10} // * This is the array in Gp
-	slice := []string{"s", "l", "i", "c", "e"}      // * This is the Slice
-	slice = append(slice, "🔪") // * Because append returns new array
-
-	fmt.Println(array)
-	fmt.Println(slice)
+	object := map[string]string{"name": "SynCROSS", "age": "18"} // * map[type of key]type of value
+	for _, value := range object {
+		fmt.Println(value)
+	}
 }
