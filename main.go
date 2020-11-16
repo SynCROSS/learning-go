@@ -11,6 +11,6 @@ type person struct {
 
 func main() {
 	// * SynCROSS := person{"SynCROSS", 18}
-	SynCROSS := person{name:"SynCROSS", age:18}
-		fmt.Println(SynCROSS.name, SynCROSS.age)
+	SynCROSS := person{name: "SynCROSS", age: 18}
+	fmt.Println(SynCROSS.name, SynCROSS.age)
 }
