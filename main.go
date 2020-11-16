@@ -4,9 +4,13 @@ import (
 	"fmt"
 )
 
+type person struct {
+	name string
+	age  int
+}
+
 func main() {
-	object := map[string]string{"name": "SynCROSS", "age": "18"} // * map[type of key]type of value
-	for _, value := range object {
-		fmt.Println(value)
-	}
+	// * SynCROSS := person{"SynCROSS", 18}
+	SynCROSS := person{name:"SynCROSS", age:18}
+		fmt.Println(SynCROSS.name, SynCROSS.age)
 }
