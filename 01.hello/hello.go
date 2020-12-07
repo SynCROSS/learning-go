@@ -5,5 +5,5 @@ import (
 )
 
 func hello() {
-	fmt.Println("Hello world") // * To export a function, the function name must begin with a capital letter.
+	fmt.Println("Hello world") // * To export thing, that thing's name must begin with a capital letter.
 }
