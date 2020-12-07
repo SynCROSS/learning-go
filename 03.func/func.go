@@ -4,11 +4,11 @@ import (
 	"fmt"
 )
 
-func multiply1(num1, num2 int) (int, string) { // * == num1 int , num2 int
-	return num1 * num2, "multiplied!"
+func multiply1(num1, num2 int) int { // * num1 int , num2 int
+	return num1 * num2
 }
 func function() {
-	name := "SynCROSS" // * var name string = "Syncross"
-	fmt.Println(name) // * To export a function, the function name must begin with a capital letter.
+	name := "SynCROSS"
+	fmt.Println(name)
 	fmt.Println(multiply1(10, 10))
 }

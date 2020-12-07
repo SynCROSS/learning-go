@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func repeat(words ...string) {
+func repeat(words ...string) { // * ... can get same type values
 	fmt.Println(words)
 }
 func lotsOfParams() {

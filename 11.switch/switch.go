@@ -6,7 +6,7 @@ import (
 
 func seasonGenerator(month int) string {
 	switch month {
-	case 3, 4, 5:
+	case 3, 4, 5: // * no more breaks
 		return "Spring"
 	case 6, 7, 8:
 		return "Summer"
