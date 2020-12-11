@@ -2,16 +2,19 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"main/dict"
 )
 
 func main() {
-	dictionary := dict.Dictionary{"name": "SynCROSS"}
-	definition, e := dictionary.Search("name")
-
+	dictionary := dict.Dictionary{}
+	e := dictionary.AddWord("name", "SynCROSS")
 	if e != nil {
-		log.Fatalln(e)
+		fmt.Println(e)
 	}
+	definition, _ := dictionary.Search("name")
 	fmt.Println(definition)
+	e2 := dictionary.AddWord("name", "SynCROSS")
+	if e2 != nil {
+		fmt.Println(e2) // * Error
+	}
 }
