@@ -1,5 +1,7 @@
 package accounts
 
+import "errors"
+
 // Account struct
 type Account struct {
 	owner   string
@@ -7,26 +9,29 @@ type Account struct {
 }
 
 // CreateAccount creates new Account
-func CreateAccount(owner string) *Account{
-  newAccount := Account{owner: owner, balance: 0}
-  return &newAccount
+func CreateAccount(owner string) *Account {
+	newAccount := Account{owner: owner, balance: 0}
+	return &newAccount
 }
+
 // Deposit for depositing x amount on account
-func (a Account) Deposit(amount int)  {
-// * This is how difference between normal function and method.
-// * '(receiver_name type_name)' is 'receiver' called in Go.
-
-// * However, there is a rule that 'receiver' 's name
-// * should be a lowercase of the first letter of the struct.
-
-// * this sentence can not make balance amount.
-// * because Go makes copy of object or struct
-// * if Object or Struct is assigned to variable.
-// * https://flaviocopes.com/go-copying-structs/
+func (a *Account) Deposit(amount int) {
+	// * asterisk can edit data directly not using copy.
+	// * it is pointer receiver because it's pointer.
 	a.balance += amount
 }
 
 // GetBalance returns account's balance
 func (a Account) GetBalance() int {
 	return a.balance
+}
+
+// Withdraw for withdrawing x amount on account
+func (a *Account) Withdraw(amount int) error {
+	if a.balance < amount {
+		// * Making custom error can stop behavior in Go.
+		return errors.New("You did NOT have enough money to withdraw")
+	}
+	a.balance -= amount
+	return nil
 }
