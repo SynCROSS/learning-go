@@ -12,5 +12,5 @@ func main() {
 	if e != nil {
 		fmt.Println(e)
 	}
-	fmt.Println(account1.GetOwner()+"'s Balance:", account1.GetBalance()) // * It Maybe Same Result because of an error.
+	fmt.Println(account1.GetOwner()+"'s Balance:", account1.GetBalance())
 }
