@@ -8,6 +8,11 @@ type Account struct {
 	balance int
 }
 
+// * Go can let developer make the Error
+// * Because Go doesn't have try~catch, exception, etc.
+// * So Go Developer can make the error variable like below.
+var errNoMoney = errors.New("You did NOT have enough money to withdraw")
+
 // CreateAccount creates new Account
 func CreateAccount(owner string) *Account {
 	newAccount := Account{owner: owner, balance: 0}
@@ -30,7 +35,7 @@ func (a Account) GetBalance() int {
 func (a *Account) Withdraw(amount int) error {
 	if a.balance < amount {
 		// * Making custom error can stop behavior in Go.
-		return errors.New("You did NOT have enough money to withdraw")
+		return errNoMoney
 	}
 	a.balance -= amount
 	return nil
