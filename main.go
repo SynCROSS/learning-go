@@ -2,10 +2,16 @@ package main
 
 import (
 	"fmt"
-	"main/accounts"
+	"log"
+	"main/dict"
 )
 
 func main() {
-	account1 := accounts.CreateAccount("SynCROSS")
-	fmt.Println(account1) // * ${SynCROSS 0} -> SynCROSS's Current Balance:0
+	dictionary := dict.Dictionary{"name": "SynCROSS"}
+	definition, e := dictionary.Search("name")
+
+	if e != nil {
+		log.Fatalln(e)
+	}
+	fmt.Println(definition)
 }
