@@ -31,6 +31,11 @@ func (a Account) GetBalance() int {
 	return a.balance
 }
 
+// GetOwner returns account's Owner
+func (a Account) GetOwner() string {
+	return a.owner
+}
+
 // Withdraw for withdrawing x amount on account
 func (a *Account) Withdraw(amount int) error {
 	if a.balance < amount {
@@ -39,4 +44,9 @@ func (a *Account) Withdraw(amount int) error {
 	}
 	a.balance -= amount
 	return nil
+}
+
+// ChangeOwner method can change Owner of the account
+func (a *Account) ChangeOwner(newOwner string) {
+	a.owner = newOwner
 }
