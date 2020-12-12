@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"main/dict"
 )
 
@@ -9,12 +10,15 @@ func main() {
 	dictionary := dict.Dictionary{}
 	e := dictionary.AddWord("name", "SynCROSS")
 	if e != nil {
-		fmt.Println(e)
+		log.Fatalln(e)
 	}
-	definition, _ := dictionary.Search("name")
-	fmt.Println(definition)
-	e2 := dictionary.AddWord("name", "SynCROSS")
+	e = dictionary.UpdateWord("name", "SSORCnyS")
+	if e != nil {
+		log.Fatalln(e)
+	}
+	word, e2 := dictionary.SearchWord("name")
 	if e2 != nil {
-		fmt.Println(e2) // * Error
+		log.Fatalln(e)
 	}
+	fmt.Println(word)
 }
