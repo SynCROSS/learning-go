@@ -11,6 +11,9 @@ var (
 	errCanNOTUpdate = errors.New("Can NOT Update non-existing word")
 )
 
+// * Dictionary is a hashmap.
+// * And by default a hashmap already has the * included.
+
 // SearchWord returns based on the presence of the word.
 func (d Dictionary) SearchWord(word string) (string, error) {
 
@@ -21,7 +24,7 @@ func (d Dictionary) SearchWord(word string) (string, error) {
 	return "", errNotFound
 }
 
-// AddWord for adding new word
+// AddWord is for adding new word
 func (d Dictionary) AddWord(word, definition string) error {
 	_, e := d.SearchWord(word)
 	if e == errNotFound {
@@ -32,7 +35,7 @@ func (d Dictionary) AddWord(word, definition string) error {
 	return nil
 }
 
-// UpdateWord for Updating existing word
+// UpdateWord is for Updating existing word
 func (d Dictionary) UpdateWord(word, definition string) error {
 	_, e := d.SearchWord(word)
 	if e == nil {
@@ -41,4 +44,12 @@ func (d Dictionary) UpdateWord(word, definition string) error {
 		return errCanNOTUpdate
 	}
 	return nil
+}
+
+// DeleteWord is for deleting word
+func (d Dictionary) DeleteWord(word string) {
+	// * The reason why I didn't use the "error" type of return type is
+	// * because the "delete" function has no return
+	// * and does nothing in the event of an error.
+	delete(d, word)
 }
