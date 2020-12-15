@@ -23,7 +23,9 @@ func main() {
 		"https://www.udemy.com/",
 	}
 	for _, url := range urls {
-		results[url] = url // ! Errors may occur. Because empty map without braces can NOT be written
+		// ! Errors may occur.
+		// ! Because empty map without braces can NOT be written
+		results[url] = url
 		hitURL(url)
 	}
 
