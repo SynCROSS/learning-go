@@ -11,7 +11,11 @@ var (
 	errCanNOTUpdate = errors.New("Can NOT Update non-existing word")
 )
 
+<<<<<<< HEAD
 // * Dictionary is a hashmap.
+=======
+// * Dictonary is a hashmap.
+>>>>>>> Changing the environment to Linux
 // * And by default a hashmap already has the * included.
 
 // SearchWord returns based on the presence of the word.
