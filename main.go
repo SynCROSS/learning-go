@@ -1,24 +1,39 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"main/dict"
+	"net/http"
 )
 
+var errRequestFailed = errors.New("Request is Failed.")
+
 func main() {
-	dictionary := dict.Dictionary{}
-	e := dictionary.AddWord("name", "SynCROSS")
-	if e != nil {
-		fmt.Println(e)
+	var results map[string]string
+
+	urls := []string{
+		"https://www.airbnb.com/",
+		"https://www.google.com/",
+		"https://www.amazon.com/",
+		"https://www.uber.com/",
+		"https://github.com/",
+		"https://soundcloud.com/",
+		"https://www.fb.com/",
+		"https://www.instagram.com/",
+		"https://www.udemy.com/",
 	}
-	word, e2 := dictionary.SearchWord("name")
-	if e2 != nil {
-		fmt.Println(e)
+	for _, url := range urls {
+		results[url] = url // ! Errors may occur. Because empty map without braces can NOT be written
+		hitURL(url)
 	}
-	dictionary.DeleteWord("name")
-	word, e2 = dictionary.SearchWord("name")
-	if e2 != nil {
-		fmt.Println(e2)
+
+}
+
+func hitURL(url string) error {
+	fmt.Println("Checking:", url)
+	res, err := http.Get(url)
+	if err == nil || res.StatusCode >= 400 {
+		return errRequestFailed
 	}
-	fmt.Println(word)
+	return nil
 }
