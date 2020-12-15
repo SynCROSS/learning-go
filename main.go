@@ -6,10 +6,10 @@ import (
 	"net/http"
 )
 
-var errRequestFailed = errors.New("Request is Failed.")
+var errRequestFailed = errors.New("Request is Failed")
 
 func main() {
-	var results map[string]string
+	var results = map[string]string{}
 
 	urls := []string{
 		"https://www.airbnb.com/",
@@ -23,10 +23,8 @@ func main() {
 		"https://www.udemy.com/",
 	}
 	for _, url := range urls {
-		// ! Errors may occur.
-		// ! Because empty map without braces can NOT be written
 		results[url] = url
-		hitURL(url)
+		hitURL(results[url])
 	}
 
 }
