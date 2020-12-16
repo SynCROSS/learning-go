@@ -9,7 +9,8 @@ import (
 var errRequestFailed = errors.New("Request is Failed")
 
 func main() {
-	var results = map[string]string{}
+	// * var results = map[string]string{}
+	var results = make(map[string]string) // * is same if you use 'make' function.
 
 	urls := []string{
 		"https://www.airbnb.com/",
