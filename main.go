@@ -22,17 +22,24 @@ func main() {
 		"https://www.instagram.com/",
 		"https://www.udemy.com/",
 	}
-	for _, url := range urls {
-		results[url] = url
-		hitURL(results[url])
-	}
 
+	for _, url := range urls {
+		result := "Success"
+		e := hitURL(url)
+		if e != nil {
+			result = "Fail"
+		}
+		results[url] = result
+	}
+	fmt.Println(results)
 }
 
 func hitURL(url string) error {
 	fmt.Println("Checking:", url)
 	res, err := http.Get(url)
-	if err == nil || res.StatusCode >= 400 {
+	// * I'm sorry. There was a typo.
+	// * err == nil => err != nil
+	if err != nil || res.StatusCode >= 400 {
 		return errRequestFailed
 	}
 	return nil
