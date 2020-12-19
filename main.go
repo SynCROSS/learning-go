@@ -32,7 +32,12 @@ func main() {
 		}
 		results[url] = result
 	}
-	fmt.Println(results)
+	fmt.Println()
+	fmt.Println("-------------------------")
+	fmt.Println()
+	for url, result := range results {
+		fmt.Println(url, result)
+	}
 }
 
 func hitURL(url string) error {
@@ -41,6 +46,7 @@ func hitURL(url string) error {
 	// * I'm sorry. There was a typo.
 	// * err == nil => err != nil
 	if err != nil || res.StatusCode >= 400 {
+		fmt.Println(err, res.StatusCode)
 		return errRequestFailed
 	}
 	return nil
