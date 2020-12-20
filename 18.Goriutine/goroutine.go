@@ -26,6 +26,7 @@ func main() {
 	result := <-channel // * but main() function waits until the Channel sends message.
 
 	fmt.Println(result)
+	fmt.Println(<-channel) // * It can also use it like this.
 
 	// time.Sleep(time.Second * 25)
 }
