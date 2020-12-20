@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"time"
 )
 
 const min = 2
@@ -11,11 +10,27 @@ const min = 2
 func main() {
 	primeNum := []int{}
 
-	go generatePrimeNumber(primeNum, min, 10000000)
-	generatePrimeNumber(primeNum, min, 10000000)
+	// * The Channel is how to communicate between main() function and GoRoutine.
+	// * It's How to Communicate by putting Channel as a Parameter instead of returning Something.
+	channel := make(chan int)
+
+	// * This is the GoRoutine.
+	// * The GoRoutine makes process asynchronous.
+	// * but GoRoutine is valid for program is running.
+	// * And the main() function doesn't wait the GoRoutine.
+	// * So if main() function has nothing to do except GoRoutine, the program ends.
+
+	go generatePrimeNumber(primeNum, min, 10000000, channel)
+	go generatePrimeNumber(primeNum, min, 10000000, channel)
+
+	result := <-channel // * but main() function waits until the Channel sends message.
+
+	fmt.Println(result)
+
+	// time.Sleep(time.Second * 25)
 }
 
-func generatePrimeNumber(primeNum []int, start, endPoint int) {
+func generatePrimeNumber(primeNum []int, start, endPoint int, channel chan int) {
 	isPrime := true
 	end := start + endPoint
 	for i := start; i < end; i++ {
@@ -29,7 +44,8 @@ func generatePrimeNumber(primeNum []int, start, endPoint int) {
 			primeNum = append(primeNum, i)
 		}
 		isPrime = true
+		// time.Sleep(time.Second)
 	}
-	fmt.Println(len(primeNum))
-	time.Sleep(time.Second)
+	channel <- len(primeNum) //* Usage
+	// return len(primeNum)
 }
