@@ -6,11 +6,18 @@ import (
 	"net/http"
 )
 
+type hitResult struct {
+	url              string
+	connectionResult string
+}
+
 var errRequestFailed = errors.New("Request is Failed")
 
 func main() {
-	// * var results = map[string]string{}
-	var results = make(map[string]string) // * is same if you use 'make' function.
+	requestResults := make(map[string]string)
+	// * When you use structure as a parameter for the Channel,
+	// * you must write a name not a format.
+	channel := make(chan hitResult)
 
 	urls := []string{
 		"https://www.airbnb.com/",
@@ -25,29 +32,25 @@ func main() {
 	}
 
 	for _, url := range urls {
-		result := "Success"
-		e := hitURL(url)
-		if e != nil {
-			result = "Fail"
-		}
-		results[url] = result
+		go hitURL(url, channel)
 	}
-	fmt.Println()
-	fmt.Println("-------------------------")
-	fmt.Println()
-	for url, result := range results {
-		fmt.Println(url, result)
+
+	for i := 0; i < len(urls); i++ {
+		result := <-channel
+		requestResults[result.url] = result.connectionResult
 	}
+
+	for url, connectionResult := range requestResults {
+		fmt.Println(url + " | " + connectionResult)
+	}
+
 }
 
-func hitURL(url string) error {
-	fmt.Println("Checking:", url)
+func hitURL(url string, channel chan<- hitResult) { // * chan<- means that Channel is Send-Only in this function
 	res, err := http.Get(url)
-	// * I'm sorry. There was a typo.
-	// * err == nil => err != nil
+	result := "Success"
 	if err != nil || res.StatusCode >= 400 {
-		fmt.Println(err, res.StatusCode)
-		return errRequestFailed
+		result = "Failure"
 	}
-	return nil
+	channel <- hitResult{url: url, connectionResult: result}
 }
