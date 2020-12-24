@@ -28,20 +28,25 @@ type extractedPosts struct {
 
 func main() {
 	var postSlice []extractedPosts
-
+	c := make(chan []extractedPosts)
 	totalPages := getTotalPages()
 
 	for i := 0; i < totalPages; i++ {
-		extractedPost := getPost(i + 1)
+		go getPost(i+1, c)
+	}
+
+	for i := 0; i < totalPages; i++ {
+		extractedPost := <-c
 		postSlice = append(postSlice, extractedPost...)
+
 	}
 
 	exportPosts(postSlice)
 }
 
-func getPost(pageNum int) []extractedPosts {
+func getPost(pageNum int, mainChannel chan<- []extractedPosts) {
 	var postSlice []extractedPosts
-
+	c := make(chan extractedPosts)
 	pageURL := baseURL + "&page=" + strconv.Itoa(pageNum)
 
 	fmt.Println("Requesting: " + pageURL)
@@ -59,11 +64,15 @@ func getPost(pageNum int) []extractedPosts {
 	posts := doc.Find(".ub-content")
 
 	posts.Each(func(i int, post *goquery.Selection) {
-		p := extractPost(post)
-		postSlice = append(postSlice, p)
+		go extractPost(post, c)
 	})
 
-	return postSlice
+	for i := 0; i < posts.Length(); i++ {
+		p := <-c
+		postSlice = append(postSlice, p)
+	}
+
+	mainChannel <- postSlice
 }
 
 func getTotalPages() int {
@@ -110,13 +119,12 @@ func decodeString(str string) string {
 	return str
 }
 
-func extractPost(post *goquery.Selection) extractedPosts {
+func extractPost(post *goquery.Selection, c chan<- extractedPosts) {
 	id := post.Find(".gall_num").Text()
 	titleClass, _ := post.Find(".gall_tit > a > em").Attr("class")
 	titleType := []rune(titleClass)
 	postType := string(titleType[14:17])
 	title := post.Find(".gall_tit > a ").Text()
-
 	replies := post.Find(".gall_tit > .reply_numbox > .reply_num").Text()
 
 	if replies == "" {
@@ -157,7 +165,7 @@ func extractPost(post *goquery.Selection) extractedPosts {
 	views := post.Find(".gall_count").Text()
 	recommend := post.Find(".gall_recommend").Text()
 
-	return extractedPosts{
+	c <- extractedPosts{
 		id:          id,
 		postType:    postType,
 		title:       title,
@@ -187,11 +195,22 @@ func exportPosts(postSlice []extractedPosts) {
 	}
 
 	writeErr := w.Write(headers)
+
 	checkError(writeErr)
 
 	for _, post := range postSlice {
-		extractedPostsSlice := []string{post.id, post.postType, post.title, post.replies, post.writer, post.dateWriting, post.views, post.recommend}
+		extractedPostsSlice := []string{
+			post.id,
+			post.postType,
+			post.title,
+			post.replies,
+			post.writer,
+			post.dateWriting,
+			post.views,
+			post.recommend,
+		}
 		postWritingErr := w.Write(extractedPostsSlice)
+
 		checkError(postWritingErr)
 	}
 
