@@ -1,56 +1,202 @@
 package main
 
 import (
-	"errors"
+	"encoding/csv"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
+	"time"
+	"unicode/utf8"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
-type hitResult struct {
-	url              string
-	connectionResult string
-}
+var baseURL string = "https://gall.dcinside.com/board/lists/?id=baseball_new9"
 
-var errRequestFailed = errors.New("Request is Failed")
+type extractedPosts struct {
+	id          string
+	postType    string
+	title       string
+	replies     string
+	writer      string
+	dateWriting string
+	views       string
+	recommend   string
+}
 
 func main() {
-	requestResults := make(map[string]string)
-	// * When you use structure as a parameter for the Channel,
-	// * you must write a name not a format.
-	channel := make(chan hitResult)
+	var postSlice []extractedPosts
 
-	urls := []string{
-		"https://www.airbnb.com/",
-		"https://www.google.com/",
-		"https://www.amazon.com/",
-		"https://www.uber.com/",
-		"https://github.com/",
-		"https://soundcloud.com/",
-		"https://www.fb.com/",
-		"https://www.instagram.com/",
-		"https://www.udemy.com/",
+	totalPages := getTotalPages()
+
+	for i := 0; i < totalPages; i++ {
+		extractedPost := getPost(i + 1)
+		postSlice = append(postSlice, extractedPost...)
 	}
 
-	for _, url := range urls {
-		go hitURL(url, channel)
-	}
-
-	for i := 0; i < len(urls); i++ {
-		result := <-channel
-		requestResults[result.url] = result.connectionResult
-	}
-
-	for url, connectionResult := range requestResults {
-		fmt.Println(url + " | " + connectionResult)
-	}
-
+	exportPosts(postSlice)
 }
 
-func hitURL(url string, channel chan<- hitResult) { // * chan<- means that Channel is Send-Only in this function
-	res, err := http.Get(url)
-	result := "Success"
-	if err != nil || res.StatusCode >= 400 {
-		result = "Failure"
+func getPost(pageNum int) []extractedPosts {
+	var postSlice []extractedPosts
+
+	pageURL := baseURL + "&page=" + strconv.Itoa(pageNum)
+
+	fmt.Println("Requesting: " + pageURL)
+
+	res, err := http.Get(pageURL)
+
+	checkError(err)
+	checkStatus(res)
+
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+
+	defer res.Body.Close()
+	checkError(err)
+
+	posts := doc.Find(".ub-content")
+
+	posts.Each(func(i int, post *goquery.Selection) {
+		p := extractPost(post)
+		postSlice = append(postSlice, p)
+	})
+
+	return postSlice
+}
+
+func getTotalPages() int {
+	totalPages := 0
+
+	res, err := http.Get(baseURL)
+
+	checkError(err)
+	checkStatus(res)
+
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	defer res.Body.Close()
+	checkError(err)
+
+	doc.Find(".bottom_paging_box").Each(func(i int, s *goquery.Selection) {
+		totalPages = s.Find("a").Length() - 1
+	})
+
+	return totalPages
+}
+
+func checkError(err error) {
+	if err != nil {
+		log.Fatalln(err)
 	}
-	channel <- hitResult{url: url, connectionResult: result}
+}
+
+func checkStatus(res *http.Response) {
+	if res.StatusCode >= 400 {
+		log.Fatalln("Requst is Failed Status:", res.StatusCode)
+	}
+}
+
+func decodeString(str string) string {
+	b := []byte(str)
+	str = ""
+
+	for len(b) > 0 {
+		r, size := utf8.DecodeRune(b)
+		str += string(r)
+		b = b[size:]
+	}
+
+	return str
+}
+
+func extractPost(post *goquery.Selection) extractedPosts {
+	id := post.Find(".gall_num").Text()
+	titleClass, _ := post.Find(".gall_tit > a > em").Attr("class")
+	titleType := []rune(titleClass)
+	postType := string(titleType[14:17])
+	title := post.Find(".gall_tit > a ").Text()
+
+	replies := post.Find(".gall_tit > .reply_numbox > .reply_num").Text()
+
+	if replies == "" {
+		replies = "[0]"
+	} else {
+		title = title[:len(title)-3]
+		title = decodeString(title)
+	}
+
+	writer := post.Find(".gall_writer > .nickname").Text()
+	ip := post.Find(".gall_writer > .ip").Text()
+	mixedWriter := writer + " " + ip
+
+	if mixedWriter == " " {
+		operator, _ := post.Find(".gall_writer").Attr("user_name")
+		if operator == "" {
+			other, _ := post.Find(".gall_writer>b > .nickname").Attr("title")
+			if other == "" {
+				another, _ := post.Find(".gall_writer").Attr("data-nick")
+				other = another
+			}
+			operator = other
+		}
+		mixedWriter = decodeString(operator)
+	}
+
+	dateWriting, _ := post.Find(".gall_date").Attr("title")
+
+	if dateWriting == "" {
+		date := post.Find(".gall_date").Text()
+		t, err := time.Parse("06/02/02", date) // ! must write like that jan 2 2006
+		checkError(err)
+		dateWriting = t.Format("2006-02-02")
+	} else {
+		dateWriting = dateWriting[:10]
+	}
+
+	views := post.Find(".gall_count").Text()
+	recommend := post.Find(".gall_recommend").Text()
+
+	return extractedPosts{
+		id:          id,
+		postType:    postType,
+		title:       title,
+		replies:     replies,
+		writer:      mixedWriter,
+		dateWriting: dateWriting,
+		views:       views,
+		recommend:   recommend}
+}
+
+func exportPosts(postSlice []extractedPosts) {
+	file, err := os.Create("DCInside.csv")
+
+	checkError(err)
+
+	w := csv.NewWriter(file)
+
+	headers := []string{
+		"id",
+		"postType",
+		"title",
+		"replies",
+		"writer",
+		"dateWriting",
+		"views",
+		"recommend",
+	}
+
+	writeErr := w.Write(headers)
+	checkError(writeErr)
+
+	for _, post := range postSlice {
+		extractedPostsSlice := []string{post.id, post.postType, post.title, post.replies, post.writer, post.dateWriting, post.views, post.recommend}
+		postWritingErr := w.Write(extractedPostsSlice)
+		checkError(postWritingErr)
+	}
+
+	defer func() {
+		w.Flush()
+		fmt.Println("File Writing is Successfully Done:", len(postSlice))
+	}()
 }
