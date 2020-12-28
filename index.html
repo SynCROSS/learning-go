@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-COMPATIBLE" content="ie=edge" />
+    <title>Golang Server</title>
+  </head>
+  <body>
+    <span>0</span>
+    <div>
+      <input type="button" id="plus" value="+" />
+      <input type="button" id="minus" value="-" />
+    </div>
+    <script>
+      const span = document.querySelector('span');
+      const plus = document.getElementById('plus');
+      const minus = document.getElementById('minus');
+
+      let num = 0;
+
+      plus.addEventListener('click', () => {
+        num += 1;
+        span.innerText = num;
+      });
+      minus.addEventListener('click', () => {
+        num -= 1;
+        span.innerText = num;
+      });
+    </script>
+  </body>
+</html>
